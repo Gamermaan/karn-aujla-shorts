@@ -1,0 +1,166 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #121212;
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+}
+
+/* Main Container */
+.main-container {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Video Player Styling */
+.video-wrapper {
+    width: 100%;
+    max-width: 800px;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    margin-bottom: 20px;
+}
+
+.video-player {
+    width: 100%;
+    display: block;
+    max-height: 70vh;
+}
+
+/* Overlay & Controls */
+.overlay {
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+h1 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+p {
+    color: #aaa;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+/* Button Styling */
+.primary-btn {
+    background: linear-gradient(45deg, #ff3366, #ff6b6b);
+    border: none;
+    padding: 12px 30px;
+    color: white;
+    font-size: 1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-weight: 600;
+}
+
+.primary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 51, 102, 0.4);
+}
+
+.primary-btn:active {
+    transform: translateY(0);
+}
+
+.status-box {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    background: rgba(0,0,0,0.3);
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: #4cd137;
+}
+
+/* Demo Area (Hidden by default) */
+.hidden {
+    display: none;
+}
+
+.demo-area {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    animation: fadeIn 0.5s ease;
+}
+
+.info-card {
+    background: rgba(0,0,0,0.3);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.info-card h3 {
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    color: #ddd;
+}
+
+#camPreview {
+    width: 100%;
+    border-radius: 4px;
+    background: #000;
+}
+
+/* Device Awareness / Responsive Design */
+@media (max-width: 768px) {
+    body {
+        align-items: flex-start; /* Better for scrolling on mobile */
+    }
+
+    .main-container {
+        padding: 0;
+    }
+
+    .video-wrapper {
+        border-radius: 0;
+        margin-bottom: 0;
+    }
+
+    .video-player {
+        height: auto;
+        min-height: 50vh; /* Takes up substantial space on mobile */
+        object-fit: cover;
+    }
+
+    .overlay {
+        border-radius: 0;
+        background: #121212;
+        padding: 30px 20px;
+    }
+
+    .demo-area {
+        grid-template-columns: 1fr; /* Stack on mobile */
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

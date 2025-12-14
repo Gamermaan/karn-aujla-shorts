@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Experience</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="main-container">
+        <!-- Video Container -->
+        <div class="video-wrapper">
+            <!-- Main Content Video -->
+            <video id="contentVideo" class="video-player" playsinline loop controls>
+                <source src="karn.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+
+        <!-- content overlay -->
+        <div class="overlay">
+            <h1>Immersive Experience</h1>
+            <p>Enable permissions to unlock the full interactive features based on your location and device.</p>
+            
+            <div id="status" class="status-box">Ready to start...</div>
+
+            <button id="startBtn" class="primary-btn">Start Experience</button>
+
+            <!-- Local Previews (Data is NOT sent anywhere) -->
+            <div id="demoArea" class="demo-area hidden">
+                <div class="info-card">
+                    <h3>Your Location (Local)</h3>
+                    <p id="locationDisplay">Waiting...</p>
+                </div>
+                <div class="info-card">
+                    <h3>Camera Mirror (Local)</h3>
+                    <video id="camPreview" autoplay playsinline muted></video>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
