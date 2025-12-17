@@ -4,9 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const camPreview = document.getElementById('camPreview');
     const contentVideo = document.getElementById('contentVideo');
 
-    // 1. Auto-play content video (Removed - waiting for permissions)
-    // contentVideo.play()... 
-
+    // 1. Ensure video is paused initially
+    contentVideo.pause();
+    contentVideo.currentTime = 0;
     // 2. Setup Permission Logic
     const permissionModal = document.getElementById('permission-modal');
     const modalContent = permissionModal.querySelector('.modal-content');
